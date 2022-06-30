@@ -51,9 +51,7 @@ K-Means adalah salah satu algoritma clustering yang mengklasterkan data ke dalam
 
 4. Kelompokkan setiap data berdasarkan kedekatannya dengan centroid (jarak terkecil).
 
-5. Perbaharui nilai centroid baru yang didapatkan dari rata-rata klaster yang bersangkutan dengan menggunakan rumus:
-
-   
+5. Perbaharui nilai centroid baru yang didapatkan dari rata-rata klaster yang bersangkutan
 
 6. Lakukan langkah ke-3 sampai 5, hingga tiap cluster tidak mengalami perubahan anggota lagi.
 
@@ -230,8 +228,4 @@ for i in range(true_k):
 
 
 
-## Referensi
-
-```{bibliography}
-
-```
+## 
