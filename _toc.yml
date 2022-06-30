@@ -6,4 +6,9 @@ root: intro
 chapters:
 - file: crawling
 - file: text pre-processing
+- file: clustering
+- url: https://colab.research.google.com/drive/1iekZwGrDT1WncuhlnIvQnVV5rxEom3hO
+  title: Code CLustering K-Means
 - file: topic modelling
+- url: https://colab.research.google.com/drive/10hAMNacfKrHJGP3A9YlVuGYGPuLZ5bT6
+  title: Code Latent Semantic Analysis

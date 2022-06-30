@@ -1,3 +1,5 @@
+
+
 # Clustering
 
 ## Apa itu Clustering?
@@ -57,57 +59,172 @@ K-Means adalah salah satu algoritma clustering yang mengklasterkan data ke dalam
 
 
 
-## Code Topic Modelling Latent Semantic Analysis (LSA)
+## Code Clustering K-Means
 
-Adapun code keseluruhan untuk melakukan topic modelling Latent Semantic Analysis (LSA) adalah sebagai berikut.
+Adapun code keseluruhan untuk melakukan clustering dengan k-means adalah sebagai berikut.
 
 ```python
 # ------ Import Library --------
+import pandas as pd
+import numpy as np
+import string
+import re
+import nltk
+import swifter
+
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.decomposition import TruncatedSVD
+from sklearn.cluster import KMeans
 ```
 
 ```python
-# ------ TF-IDF --------
-vect = TfidfVectorizer(stop_words=list_stopwords,max_features=1000)
-vect_text = vect.fit_transform(papers['Abstrak_Lowercase'])
-print(vect_text.shape)
-print(vect_text)
+# ------ Load Data --------
+data = pd.read_csv("ta-manajemen.csv")
+data
 ```
 
 ```python
-# ------ Singular Value Decomposition (SVD) --------
-lsa_model = TruncatedSVD(n_components=10, algorithm='randomized', n_iter=10, random_state=42)
-lsa_top=lsa_model.fit_transform(vect_text)
-print(lsa_top)
-print(lsa_top.shape)
+# ------ Case Folding --------
+# gunakan fungsi Series.str.lower() pada Pandas
+data['abstrak_lowercase'] = data['abstraksi'].str.lower()
+print('Case Folding Result : \n')
+print(data['abstrak_lowercase'].head(5))
 ```
 
 ```python
-# ------ Menampilkan hasil topik --------
-l=lsa_top[0]
-print("Document 0 :")
-for i,topic in enumerate(l):
-  print("Topic ",i," : ",topic*100)
+# ------ Tokenizing ---------
+
+def remove_desc_special(abstrak):
+    # hapus tab, baris baru, dan irisan belakang
+    abstrak = abstrak.replace('\\t'," ").replace('\\n'," ").replace('\\u'," ").replace('\\',"")
+    # hapus non ASCII (emotikon, kata cina, .etc)
+    abstrak = abstrak.encode('ascii', 'replace').decode('ascii')
+    # hapus mention, link, tagar
+    abstrak = ' '.join(re.sub("([@#][A-Za-z0-9]+)|(\w+:\/\/\S+)"," ", abstrak).split())
+    # hapus URL
+    return abstrak.replace("http://", " ").replace("https://", " ")
+                
+# hapus angka
+def remove_number(abstrak):
+    return  re.sub(r"\d+", "", abstrak)
+
+# hapus tanda baca, simbol
+def remove_punctuation(abstrak):
+    return abstrak.translate(str.maketrans("","",string.punctuation))
+
+# hapus spasi di awal & akhir
+def remove_whitespace_LT(abstrak):
+    return abstrak.strip()
+
+# hapus beberapa spasi putih menjadi spasi tunggal
+def remove_whitespace_multiple(abstrak):
+    return re.sub('\s+',' ',abstrak)
+
+# hapus char tunggal
+def remove_singl_char(abstrak):
+    return re.sub(r"\b[a-zA-Z]\b", "", abstrak)
+
+# NLTK word_tokenize 
+def word_tokenize_wrapper(abstrak):
+    return word_tokenize(abstrak)
+
+data['abstrak_lowercase'] = data['abstrak_lowercase'].apply(remove_desc_special)
+data['abstrak_lowercase'] = data['abstrak_lowercase'].apply(remove_number)
+data['abstrak_lowercase'] = data['abstrak_lowercase'].apply(remove_punctuation)
+data['abstrak_lowercase'] = data['abstrak_lowercase'].apply(remove_whitespace_LT)
+data['abstrak_lowercase'] = data['abstrak_lowercase'].apply(remove_whitespace_multiple)
+data['abstrak_lowercase'] = data['abstrak_lowercase'].apply(remove_singl_char)
+data['abstrak_tokens'] = data['abstrak_lowercase'].apply(word_tokenize_wrapper)
+
+print('Tokenizing Result : \n') 
+print(data['abstrak_tokens'].head())
 ```
 
 ```python
-# ------ Menampilkan nilai komponen tiap topik --------
-print(lsa_model.components_.shape)
-print(lsa_model.components_)
+# ------ Stopwords Removal ---------
+
+# ambil list stopword indonesia
+list_stopwords = stopwords.words('indonesian')
+
+# konversi string stopword ke daftar & tambahkan stopword
+list_stopwords = set(list_stopwords)
+
+# hapus stopword yang ada pada list
+def stopwords_removal(words):
+    return [word for word in words if word not in list_stopwords]
+
+data['abstrak_stopwords'] = data['abstrak_tokens'].apply(stopwords_removal) 
+
+print('Stopwords Result : \n') 
+print(data['abstrak_stopwords'].head())
 ```
 
 ```python
-# ------ Menampilkan kata penting tiap topik --------
-vocab = vect.get_feature_names_out()
+# ------ Stemming ---------
+# buat stemmer
+factory = StemmerFactory()
+stemmer = factory.create_stemmer()
 
-for i, comp in enumerate(lsa_model.components_):
-    vocab_comp = zip(vocab, comp)
-    sorted_words = sorted(vocab_comp, key= lambda x:x[1], reverse=True)[:10]
-    print("Topic "+str(i)+": ")
-    for t in sorted_words:
-        print(t[0],end=" ")
-    print("\n")
+def stemmed(term):
+    return stemmer.stem(term)
+
+term_dict = {}
+
+for abstrak in data['abstrak_stopwords']:
+    for term in abstrak:
+        if term not in term_dict:
+            term_dict[term] = ' '
+
+#hitung berapa jumlah kata yang didapat
+print(len(term_dict))
+print("------------------------")
+
+for term in term_dict:
+    term_dict[term] = stemmed(term)
+    print(term,":" ,term_dict[term])
+    
+print(term_dict)
+print("------------------------")
+
+# terapkan get_stemmed_term() ke atribut deskripsi dalam Dataframe dengan swifter
+def get_stemmed_term(desc):
+    return [term_dict[term] for term in desc]
+
+data['abstrak_stemming'] = data['abstrak_stopwords'].swifter.apply(get_stemmed_term)
+print(data['abstrak_stemming'])
+```
+
+```python
+# ------ TF-IDF ---------
+vectorizer = TfidfVectorizer(stop_words='english')
+ta_mj = []
+for data in data['abstrak_stemming']:
+    content = ''
+    for term in data:
+        content += term + ' '
+    ta_mj.append(content)
+
+vectorizer.fit(ta_mj)
+vector = vectorizer.fit_transform(ta_mj)
+print(vector)
+```
+
+```python
+# ------ Clustering K-Means ---------
+true_k = 5
+model = KMeans(n_clusters=true_k, init='k-means++', max_iter=100, n_init=1)
+model.fit(vector)
+
+print("Top terms per cluster:")
+order_centroids = model.cluster_centers_.argsort()[:, ::-1]
+terms = vectorizer.get_feature_names()
+for i in range(true_k):
+    print("Cluster %d:" % i),
+    for ind in order_centroids[i, :10]:
+        print(' %s' % terms[ind]),
+    print
 ```
 
 
