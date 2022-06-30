@@ -465,11 +465,13 @@ title="Print to PDF"
 </div>
 </li>
 <li><p>Proses dekomposisi matriks (SVD)</p>
-<p>SVD digunakan untuk dekomposisi matriks dalam mencari kesamaan antar tiap kata. Rumus pada SVD yaitu sebagai berikut.
-$<span class="math notranslate nohighlight">\(
-\mathrm{A} \approx \mathbf{U S V}^{\mathbf{T}}
-\)</span>$</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ------ Singular Value Decomposition (SVD) --------</span>
+<p>SVD digunakan untuk dekomposisi matriks dalam mencari kesamaan antar tiap kata. Rumus pada SVD yaitu sebagai berikut.</p>
+<div class="math notranslate nohighlight">
+\[
+   \mathrm{A} \approx \mathbf{U S V}^{\mathbf{T}}
+   \]</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+<span class="c1"># ------ Singular Value Decomposition (SVD) --------</span>
 <span class="n">lsa_model</span> <span class="o">=</span> <span class="n">TruncatedSVD</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s1">&#39;randomized&#39;</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
 <span class="n">lsa_top</span><span class="o">=</span><span class="n">lsa_model</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">vect_text</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">lsa_top</span><span class="p">)</span>
