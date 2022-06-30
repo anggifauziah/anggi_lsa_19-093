@@ -24,6 +24,7 @@ Oleh karena itu, metode LSA ini meliputi dekomposisi matriks pada document-term 
 Singular Value Decomposition adalah konsep inti dalam machine learning dan digunakan untuk memahami data dengan banyak noise dan salah satu metode untuk reduksi dimensi yang paling umum digunakan. Rumus pada SVD yaitu sebagai berikut.
 
 
+
 $$
 \mathrm{A} \approx \mathbf{U S V}^{\mathbf{T}}
 $$
@@ -71,6 +72,7 @@ V = orthogonal matrix dengan size n * n
    Mengubah teks menjadi TF-IDF dengan library sklearn. Untuk rumus dari TF-IDF sendiri yaitu seperti berikut.
 
    
+
    $$
    W_{d t}=t f_{d t} * I D F_{t}
    $$
@@ -108,6 +110,7 @@ V = orthogonal matrix dengan size n * n
    SVD digunakan untuk dekomposisi matriks dalam mencari kesamaan antar tiap kata. Rumus pada SVD yaitu sebagai berikut.
 
    
+
    $$
    \mathrm{A} \approx \mathbf{U S V}^{\mathbf{T}}
    $$
@@ -262,3 +265,4 @@ for i, comp in enumerate(lsa_model.components_):
 ```{bibliography}
 
 ```
+
