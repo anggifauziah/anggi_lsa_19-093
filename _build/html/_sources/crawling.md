@@ -225,8 +225,4 @@ class CrawlingDataSpider(scrapy.Spider):
 
 
 
-## Referensi
-
-```{bibliography}
-
-```
+## 

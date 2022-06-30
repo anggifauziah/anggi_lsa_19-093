@@ -260,9 +260,5 @@ for i, comp in enumerate(lsa_model.components_):
 
 
 
-## Referensi
-
-```{bibliography}
-
-```
+## 
 
